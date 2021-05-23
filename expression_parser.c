@@ -29,7 +29,7 @@ bool isop(char c)
 node in[3000];
 node post[3000];
 node stack[3000];
-bool eval(const char *exp)
+bool eval(const char *exp,const char *e_mail,int e_mail_len)
 {
 	int explen=strlen(exp);
 	int inorder_size=0;
@@ -51,7 +51,7 @@ bool eval(const char *exp)
 				else break;
 			}
 			in[inorder_size].type=TOK;
-			in[inorder_size].data=eval_token(exp+i,token_end-i+1);
+			in[inorder_size].data=eval_token(exp+i,token_end-i+1,e_mail,e_mail_len);
 			inorder_size++;
 			i=token_end;
 		}
@@ -121,7 +121,33 @@ bool eval(const char *exp)
 }
 signed main()
 {
-	char s[2000]="((!(!1))&(!1))";
-	printf("%d",eval(s));
+	void api.init(int *n_mails, int *n_queries, mail **mails, query **queries);
+	for(int i=0;i<n_queries;i++)
+	{
+		if(queries[i].type == expression_match)
+		{
+			int answer[n_mail+1],cnt=0;
+			for(int j=0;j<n_mail;j++)
+			{
+				int len;
+				for(int k=0;k<100000;k++)
+                {
+                    if(mails[j].content[k]=='\0')
+                    {
+                        len=k+1;
+                        break;
+                    }
+                }
+                if(eval(s,mails[j].content,len))
+                {
+                    answer[cnt]=j;
+                    cnt++;
+                }
+			}
+			api.answer(i,answer,cnt);
+		}
+	}
+	//printf("%d",eval(s));
 	return 0;
 }
+
