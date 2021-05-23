@@ -9,12 +9,18 @@ typedef struct node
 {
 	int type,data;
 }node;
-int eval_token(const char *token,int len)
+int eval_token(const char *token,int len,char *e_mail,int e_mail_len)
 {
-	int h=0;
-	for(int i=0;i<len;i++)
-		h=h*10+token[i]-'0';
-	return 1;
+	for(int i=0;i<e_mail_len-len;i++)
+	{
+		for(int j=0;j<len;j++)
+		{
+			if(e_mail[i+j]!=token[i])
+				break;
+			if(j==len-1) return 1;
+		}
+	}
+	return 0;
 }
 bool isop(char c)
 {
