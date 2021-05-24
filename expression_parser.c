@@ -6,6 +6,9 @@
 #define SWAP(a,b,type) {type tmp=a;a=b;b=tmp;}
 #define TOK 1
 #define OPR 2
+int n_mails,n_queries;
+mail *mails;
+query *queries;
 typedef struct node
 {
 	int type,data;
@@ -120,24 +123,19 @@ bool eval(const char *exp,const char *e_mail,int e_mail_len)
 	}
 	return stack[0].data;
 }
-signed main()
+int main(void)
 {
-	int *n_mails,*n_queries;
-	mail **mails;
-	query **queries;
-	printf("INIT\n");
-	api_init(n_mails, n_queries, mails,queries);
-	printf("INIT_finish");
-	for(int i=0;i<*n_queries;i++)
+	api_init(&n_mails, &n_queries, &mails, &queries);
+	for(int i=0;i<n_queries;i++)
 	{
-		if(queries[i]->type == expression_match)
+		if(queries[i].type == expression_match)
 		{
-			int answer[*n_mails+1],cnt=0;
-			for(int j=0;j<*n_mails;j++)
+			int answer[n_mails+1],cnt=0;
+			for(int j=0;j<n_mails;j++)
 			{
-				int len=strlen(mails[j]->content);
+				int len=strlen(mails[j].content);
 
-                if(eval(queries[i]->data.expression_match_data.expression,mails[j]->content,len))
+                if(eval(queries[i].data.expression_match_data.expression,mails[j].content,len))
                 {
                     answer[cnt]=j;
                     cnt++;
@@ -146,7 +144,6 @@ signed main()
 			api.answer(i,answer,cnt);
 		}
 	}
-	//printf("%d",eval(s));
 	return 0;
 }
 
