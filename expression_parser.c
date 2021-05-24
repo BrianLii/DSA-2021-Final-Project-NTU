@@ -1,3 +1,4 @@
+#include "api.h"
 #include<stdio.h>
 #include<stdlib.h>
 #include<string.h>
@@ -9,7 +10,7 @@ typedef struct node
 {
 	int type,data;
 }node;
-int eval_token(const char *token,int len,char *e_mail,int e_mail_len)
+int eval_token(const char *token,int len,const char *e_mail,int e_mail_len)
 {
 	for(int i=0;i<e_mail_len-len;i++)
 	{
@@ -121,24 +122,22 @@ bool eval(const char *exp,const char *e_mail,int e_mail_len)
 }
 signed main()
 {
-	void api.init(int *n_mails, int *n_queries, mail **mails, query **queries);
-	for(int i=0;i<n_queries;i++)
+	int *n_mails,*n_queries;
+	mail **mails;
+	query **queries;
+	printf("INIT\n");
+	api_init(n_mails, n_queries, mails,queries);
+	printf("INIT_finish");
+	for(int i=0;i<*n_queries;i++)
 	{
-		if(queries[i].type == expression_match)
+		if(queries[i]->type == expression_match)
 		{
-			int answer[n_mail+1],cnt=0;
-			for(int j=0;j<n_mail;j++)
+			int answer[*n_mails+1],cnt=0;
+			for(int j=0;j<*n_mails;j++)
 			{
-				int len;
-				for(int k=0;k<100000;k++)
-                {
-                    if(mails[j].content[k]=='\0')
-                    {
-                        len=k+1;
-                        break;
-                    }
-                }
-                if(eval(s,mails[j].content,len))
+				int len=strlen(mails[j]->content);
+
+                if(eval(queries[i]->data.expression_match_data.expression,mails[j]->content,len))
                 {
                     answer[cnt]=j;
                     cnt++;
