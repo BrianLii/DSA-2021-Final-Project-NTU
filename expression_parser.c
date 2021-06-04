@@ -9,12 +9,10 @@
 int n_mails,n_queries;
 mail *mails;
 query *queries;
-
 typedef struct node
 {
 	int type,data;
 }node;
-
 int token_in_email(const char *token,int token_len,char *email,int email_len)
 {
 	for(int i=0;i<email_len-token_len;i++)

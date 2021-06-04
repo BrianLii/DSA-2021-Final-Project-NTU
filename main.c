@@ -3,23 +3,71 @@
 #include<stdlib.h>
 #include<string.h>
 #include<stdbool.h>
+#include<ctype.h>
 #define SWAP(a,b,type) {type tmp=a;a=b;b=tmp;}
 #define TOK 1
 #define OPR 2
+#define ll long long
 int n_mails,n_queries;
 mail *mails;
 query *queries;
+int answer[20000];
+//change content to lowercase, split token and create hash table
+struct hash_pair{
+	ll hash1,hash2;
+};
+struct hash_pair* *mails_hash;
+ll *mails_tokennum,seed=13131,base=15401689,mod1=73907987,mod2=16523471;
+//hash_pair compare functions
+bool isgreater(const struct hash_pair a, const struct hash_pair b){
+	if(a.hash1==b.hash1) return a.hash2 > b.hash2;
+	return a.hash1 > b.hash1;
+}
+bool isequal(const struct hash_pair a,const struct hash_pair b){
+	if(a.hash1==b.hash1&&a.hash2==b.hash2) return 1;
+	return 0;
+}
+int hp_cmp(const void *a, const void *b){
+	struct hash_pair c = *(struct hash_pair*) a, d = *(struct hash_pair*) b;
+	if(isequal(c,d)) return 0;
+	if(isgreater(c,d)) return 1;
+	else return -1;
+}
+void content2hash(char *content,int len,int z){
+	int token_counter = 0, capacity = 1;
+	struct hash_pair *h = calloc(1,sizeof(struct hash_pair)),temp;
+	temp.hash1 = 0;
+	temp.hash1 = 0;
+	for(int i=0,j=0;content[i]!='\0';i=j+1){
+		while(!isalnum((int) content[i])) i++;
+		j=i;
+		while(isalnum((int) content[j])){
+			content[j] = (char) tolower((int) content[j]);
+			temp.hash1 = (temp.hash1*seed + (int) content[j]) % mod1;
+			temp.hash2 = (temp.hash2 + (int) content[j]*base) % mod2;
+			j++;
+		}
+		j--;
+		//i to j is a token
+		if(token_counter==capacity){
+			capacity = capacity<<1;
+			h = realloc(h, capacity*sizeof(struct hash_pair));
+		}
+		h[token_counter] = temp;
+		token_counter++;
+		temp.hash1 = 0;
+		temp.hash2 = 0;
+	}
+	h = realloc(h, token_counter*sizeof(struct hash_pair));//save some memory
+	qsort(h,token_counter,sizeof(struct hash_pair),hp_cmp);//sort hash table
+	mails_hash[z] = h;
+	mails_tokennum[z] = token_counter;
+}
+//expression
 typedef struct node
 {
 	int type,data;
 }node;
-const long long base=15401689,mod=16523471;
-int string_hash(const char *s,int len)
-{
-	long long h=0;
-	for(int i=0;i<len;i++)h=(h*base+s[i])%mod;
-	return h;
-}
 int token_in_email(const char *token,int token_len,char *email,int email_len)
 {
 	for(int i=0;i<email_len-token_len;i++)
@@ -125,10 +173,16 @@ bool eval(const char *exp,const char *e_mail,int e_mail_len)
 	}
 	return stack[0].data;
 }
-int answer[20000];
+//main
 int main(void)
 {
 	api_init(&n_mails, &n_queries, &mails, &queries);
+	//change content to lowercase, split token and create hash table
+	mails_hash = malloc(n_mails * sizeof(struct hash_pair));
+	mails_tokennum = malloc(n_mails * sizeof(ll));
+	for(int i=0;i<n_mails;i++){
+		content2hash(mails[i].content,strlen(mails[i].content),i);
+	}
 	for(int i=0;i<n_mails;i++)
 	{
 		for(int j=0;;j++)
