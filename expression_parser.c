@@ -9,26 +9,23 @@
 int n_mails,n_queries;
 mail *mails;
 query *queries;
+
 typedef struct node
 {
 	int type,data;
 }node;
-int eval_token(const char *token,int len,const char *e_mail,int e_mail_len)
+
+int token_in_email(const char *token,int token_len,char *email,int email_len)
 {
-	for(int i=0;i<e_mail_len-len;i++)
+	for(int i=0;i<email_len-token_len;i++)
 	{
-		for(int j=0;j<len;j++)
-		{
-			if(e_mail[i+j]!=token[i])
-				break;
-			if(j==len-1) return 1;
-		}
+		if(strncmp(token,email+i,token_len)==0)return 1;
 	}
 	return 0;
 }
 bool isop(char c)
 {
-	return(c=='('||c==')'||c=='&'||c=='!'||c=='&'||c=='|');
+	return (c=='('||c==')'||c=='&'||c=='!'||c=='&'||c=='|');
 }
 node in[3000];
 node post[3000];
@@ -55,7 +52,7 @@ bool eval(const char *exp,const char *e_mail,int e_mail_len)
 				else break;
 			}
 			in[inorder_size].type=TOK;
-			in[inorder_size].data=eval_token(exp+i,token_end-i+1,e_mail,e_mail_len);
+			in[inorder_size].data=token_in_email(exp+i,token_end-i+1,e_mail,e_mail_len);
 			inorder_size++;
 			i=token_end;
 		}
@@ -123,18 +120,26 @@ bool eval(const char *exp,const char *e_mail,int e_mail_len)
 	}
 	return stack[0].data;
 }
+int answer[20000];
 int main(void)
 {
 	api_init(&n_mails, &n_queries, &mails, &queries);
+	for(int i=0;i<n_mails;i++)
+	{
+		for(int j=0;;j++)
+		{
+			if(mails[i].content[j]==0)break;
+			else mails[i].content[j]=tolower(mails[i].content[j]);
+		}
+	}
 	for(int i=0;i<n_queries;i++)
 	{
 		if(queries[i].type == expression_match)
 		{
-			int answer[n_mails+1],cnt=0;
+			int cnt=0;
 			for(int j=0;j<n_mails;j++)
 			{
 				int len=strlen(mails[j].content);
-
                 if(eval(queries[i].data.expression_match_data.expression,mails[j].content,len))
                 {
                     answer[cnt]=j;
