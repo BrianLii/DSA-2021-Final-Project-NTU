@@ -37,16 +37,28 @@ ll *token_set[10020];
 int token_set_size[10020];
 void build_token_set(int email_id)
 {
-	char *content=mails[email_id].content;
-	int email_len=strlen(content);
+	char *content=mails[email_id].content, *subject=mails[email_id].subject;
+	int content_len=strlen(content), subject_len=strlen(subject);
 	int token_cnt=0;
-	for(int i=0;i<email_len;i++)
+	for(int i=0;i<content_len;i++)
 	{
 		if(!isch(content[i]))continue;
 		int r=i;
-		for(int j=i;j<email_len;j++)
+		for(int j=i;j<content_len;j++)
 		{
 			if(isch(content[j]))r=j;
+			else break;
+		}
+		token_cnt++;
+		i=r;
+	}
+	for(int i=0;i<subject_len;i++)
+	{
+		if(!isch(subjectt[i]))continue;
+		int r=i;
+		for(int j=i;j<subject_len;j++)
+		{
+			if(isch(subject[j]))r=j;
 			else break;
 		}
 		token_cnt++;
@@ -55,16 +67,28 @@ void build_token_set(int email_id)
 	token_set[email_id]=calloc(token_cnt,sizeof(ll));
 	token_set_size[email_id]=token_cnt;
 	token_cnt=0;
-	for(int i=0;i<email_len;i++)
+	for(int i=0;i<content_len;i++)
 	{
 		if(!isch(content[i]))continue;
 		int r=i;
-		for(int j=i;j<email_len;j++)
+		for(int j=i;j<content_len;j++)
 		{
 			if(isch(content[j]))r=j;
 			else break;
 		}
 		token_set[email_id][token_cnt++]=hash_string(content+i,r-i+1);
+		i=r;
+	}
+	for(int i=0;i<subject_len;i++)
+	{
+		if(!isch(subject[i]))continue;
+		int r=i;
+		for(int j=i;j<subject_len;j++)
+		{
+			if(isch(subject[j]))r=j;
+			else break;
+		}
+		token_set[email_id][token_cnt++]=hash_string(subject+i,r-i+1);
 		i=r;
 	}
 	qsort(token_set[email_id],token_cnt,sizeof(ll),ll_compare);
@@ -196,6 +220,11 @@ int main(void)
 		{
 			if(mails[i].content[j]==0)break;
 			else mails[i].content[j]=tolower(mails[i].content[j]);
+		}
+		for(int j=0;;j++)
+		{
+			if(mails[i].subject[j]==0)break;
+			else mails[i].subject[j]=tolower(mails[i].subject[j]);
 		}
 		build_token_set(i);
 	}
