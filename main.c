@@ -16,6 +16,49 @@ typedef struct node
 	int type,data;
 }node;
 typedef long long ll;
+int ll_compare (const void *a, const void *b)
+{
+	if(*(ll*)a<*(ll*)b)return -1;
+	if(*(ll*)a==*(ll*)b)return 0;
+	return 1;
+}
+inline int lower_bound(ll *a,int n,ll k);
+int lower_bound(ll *a,int n,ll k)
+{
+	int l=0,r=n-1;
+	int res=n;
+	while(l<=r)
+	{
+		int mid=(l+r)>>1;
+		if(a[mid]<k)
+		{
+			l=mid+1;
+		}
+		else
+		{
+			res=mid;
+			r=mid-1;
+		}
+	}
+	return res;
+}
+int unique(ll *a,int n)
+{
+	int tail=0;
+	for(int i=1;i<n;i++)
+	{
+		for(int j=i;j<n;j++)
+		{
+			if(a[j]!=a[j-1])
+			{
+				a[++tail]=a[j];
+				i=j;
+				break;
+			}
+		}
+	}
+	return tail+1;
+}
 const ll base1=15401689;
 const ll base2=10580467;
 const ll mod=9196699;
@@ -27,38 +70,20 @@ ll hash_string(const char *s,int len)
 	for(int i=0;i<len;i++)h2=(h2*base2+s[i])%mod;
 	return h1*mod+h2;
 }
-int ll_compare (const void *a, const void *b)
-{
-	if(*(ll*)a<*(ll*)b)return -1;
-	if(*(ll*)a==*(ll*)b)return 0;
-	else return 1;
-}
 ll *token_set[10020];
 int token_set_size[10020];
 void build_token_set(int email_id)
 {
-	char *content=mails[email_id].content, *subject=mails[email_id].subject;
-	int content_len=strlen(content), subject_len=strlen(subject);
+	char *content=mails[email_id].content;
+	int email_len=strlen(content);
 	int token_cnt=0;
-	for(int i=0;i<content_len;i++)
+	for(int i=0;i<email_len;i++)
 	{
 		if(!isch(content[i]))continue;
 		int r=i;
-		for(int j=i;j<content_len;j++)
+		for(int j=i;j<email_len;j++)
 		{
 			if(isch(content[j]))r=j;
-			else break;
-		}
-		token_cnt++;
-		i=r;
-	}
-	for(int i=0;i<subject_len;i++)
-	{
-		if(!isch(subject[i]))continue;
-		int r=i;
-		for(int j=i;j<subject_len;j++)
-		{
-			if(isch(subject[j]))r=j;
 			else break;
 		}
 		token_cnt++;
@@ -67,28 +92,16 @@ void build_token_set(int email_id)
 	token_set[email_id]=calloc(token_cnt,sizeof(ll));
 	token_set_size[email_id]=token_cnt;
 	token_cnt=0;
-	for(int i=0;i<content_len;i++)
+	for(int i=0;i<email_len;i++)
 	{
 		if(!isch(content[i]))continue;
 		int r=i;
-		for(int j=i;j<content_len;j++)
+		for(int j=i;j<email_len;j++)
 		{
 			if(isch(content[j]))r=j;
 			else break;
 		}
 		token_set[email_id][token_cnt++]=hash_string(content+i,r-i+1);
-		i=r;
-	}
-	for(int i=0;i<subject_len;i++)
-	{
-		if(!isch(subject[i]))continue;
-		int r=i;
-		for(int j=i;j<subject_len;j++)
-		{
-			if(isch(subject[j]))r=j;
-			else break;
-		}
-		token_set[email_id][token_cnt++]=hash_string(subject+i,r-i+1);
 		i=r;
 	}
 	qsort(token_set[email_id],token_cnt,sizeof(ll),ll_compare);
@@ -210,10 +223,99 @@ bool eval(const char *exp,int email_id)
 	}
 	return stack[0].data;
 }
+
+int dsu_lead[20020];
+int dsu_size[20020];
+int dsu_maxsize;
+int dsu_numg;
+int dsu_find(int x)
+{
+	if(dsu_lead[x]==x)return x;
+	return dsu_lead[x]=dsu_find(dsu_lead[x]);
+}
+void dsu_U(int x,int y)
+{
+	x=dsu_find(x);y=dsu_find(y);
+	if(x==y)return;
+	int ts=dsu_size[x]+dsu_size[y];
+	dsu_lead[y]=x;
+	dsu_size[x]=ts;
+	dsu_numg--;
+	if(ts>dsu_maxsize)
+		dsu_maxsize=ts;
+}
 int answer[20000];
+ll name_hash[20020];
+int from_hash[20020];
+int to_hash[20020];
+void G_A(int query_id)
+{
+	int len=queries[query_id].data.group_analyse_data.len;
+	int *mid=queries[query_id].data.group_analyse_data.mids;
+	dsu_numg=0;
+	dsu_maxsize=1;
+	//make set
+	for(int i=0;i<len;i++)
+	{
+		dsu_lead[from_hash[mid[i]]]=-1;
+		dsu_lead[to_hash[mid[i]]]=-1;
+		dsu_size[from_hash[mid[i]]]=1;
+		dsu_size[to_hash[mid[i]]]=1;
+	}
+	for(int i=0;i<len;i++)
+	{
+		if(dsu_lead[from_hash[mid[i]]]==-1)
+		{
+			dsu_numg++;
+			dsu_lead[from_hash[mid[i]]]=from_hash[mid[i]];
+		}
+		if(dsu_lead[to_hash[mid[i]]]==-1)
+		{
+			dsu_numg++;
+			dsu_lead[to_hash[mid[i]]]=to_hash[mid[i]];
+		}
+	}
+	for(int i=0;i<len;i++)
+	{
+		dsu_U(from_hash[mid[i]],to_hash[mid[i]]);
+	}
+	answer[0]=dsu_numg;
+	answer[1]=dsu_maxsize;
+	api.answer(query_id,answer,2);
+}
+
+void build_name_hash()
+{
+	for(int i=0;i<n_mails;i++)
+	{
+		name_hash[i*2]=hash_string(mails[i].from,strlen(mails[i].from));
+		name_hash[i*2+1]=hash_string(mails[i].to,strlen(mails[i].to));
+	}
+	qsort(name_hash,n_mails*2,sizeof(ll),ll_compare);
+	int n=unique(name_hash,n_mails*2);
+	for(int i=0;i<n_mails;i++)
+	{
+		ll h1=hash_string(mails[i].from,strlen(mails[i].from));
+		ll h2=hash_string(mails[i].to,strlen(mails[i].to));
+		h1=lower_bound(name_hash,n,h1);
+		h2=lower_bound(name_hash,n,h2);
+		from_hash[i]=h1;
+		to_hash[i]=h2;
+	}
+}
+
 int main(void)
 {
 	api_init(&n_mails, &n_queries, &mails, &queries);
+	build_name_hash();
+	for(int i=0;i<n_queries;i++)
+	{
+		if(queries[i].type==group_analyse)
+		{
+			G_A(i);
+		}
+	}
+	return;
 	for(int i=0;i<n_mails;i++)
 	{
 		for(int j=0;;j++)
@@ -221,30 +323,21 @@ int main(void)
 			if(mails[i].content[j]==0)break;
 			else mails[i].content[j]=tolower(mails[i].content[j]);
 		}
-		for(int j=0;;j++)
-		{
-			if(mails[i].subject[j]==0)break;
-			else mails[i].subject[j]=tolower(mails[i].subject[j]);
-		}
 		build_token_set(i);
 	}
 	for(int i=0;i<n_queries;i++)
 	{
-		if(queries[i].type == expression_match)
+		if(queries[i].type==expression_match)
 		{
-			int cnt=0;
+			int ans_len=0;
 			for(int j=0;j<n_mails;j++)
-			{
                 if(eval(queries[i].data.expression_match_data.expression,j))
-                {
-                    answer[cnt]=j;
-                    cnt++;
-                }
-			}
-			if(cnt!=0)api.answer(i,answer,cnt);
+                    answer[ans_len++]=j;
+			if(ans_len!=0)api.answer(i,answer,ans_len);
 			else api.answer(i,NULL,0);
 		}
 	}
 	return 0;
 }
+
 
