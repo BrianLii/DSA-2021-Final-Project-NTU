@@ -54,7 +54,7 @@ void build_token_set(int email_id)
 	}
 	for(int i=0;i<subject_len;i++)
 	{
-		if(!isch(subjectt[i]))continue;
+		if(!isch(subject[i]))continue;
 		int r=i;
 		for(int j=i;j<subject_len;j++)
 		{
