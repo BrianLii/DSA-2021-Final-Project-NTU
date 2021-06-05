@@ -315,7 +315,6 @@ int main(void)
 			G_A(i);
 		}
 	}
-	return;
 	for(int i=0;i<n_mails;i++)
 	{
 		for(int j=0;;j++)
