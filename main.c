@@ -7,7 +7,7 @@
 #define TOK 1
 #define OPR 2
 #define isop(c) (c=='('||c==')'||c=='&'||c=='!'||c=='|')
-#define isch(c) (('0'<=c&&c<='9')||('a'<=c&&c<='z')||('A'<=c&&c<='Z'))
+#define isch(c) (('0'<=c&&c<='9')||('a'<=c&&c<='z'))
 int n_mails,n_queries;
 mail *mails;
 query *queries;
@@ -126,7 +126,25 @@ bool eval(const char *exp,int email_id)
 			}
 			stack_size--;
 		}
-		else if(in[i].data)
+		else if(in[i].data=='!')
+		{
+			while(stack_size>0&&stack[stack_size-1].data!='('&&stack[stack_size-1].data!='&'&&stack[stack_size-1].data!='|')
+			{
+				post[postorder_size++]=stack[stack_size-1];
+				stack_size--;
+			}
+			stack[stack_size++]=in[i];
+		}
+		else if(in[i].data=='&')
+		{
+			while(stack_size>0&&stack[stack_size-1].data!='('&&stack[stack_size-1].data!='|')
+			{
+				post[postorder_size++]=stack[stack_size-1];
+				stack_size--;
+			}
+			stack[stack_size++]=in[i];
+		}
+		else if(in[i].data=='|')
 		{
 			while(stack_size>0&&stack[stack_size-1].data!='(')
 			{
