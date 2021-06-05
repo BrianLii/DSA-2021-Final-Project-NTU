@@ -6,6 +6,8 @@
 #define SWAP(a,b,type) {type tmp=a;a=b;b=tmp;}
 #define TOK 1
 #define OPR 2
+#define isop(c) (c=='('||c==')'||c=='&'||c=='!'||c=='|')
+#define isch(c) (('0'<=c&&c<='9')||('a'<=c&&c<='z')||('A'<=c&&c<='Z'))
 int n_mails,n_queries;
 mail *mails;
 query *queries;
@@ -13,29 +15,70 @@ typedef struct node
 {
 	int type,data;
 }node;
-const long long base=15401689,mod=16523471;
-int string_hash(const char *s,int len)
+typedef long long ll;
+const ll base1=15401689;
+const ll base2=10580467;
+const ll mod=9196699;
+ll hash_string(const char *s,int len)
 {
-	long long h=0;
-	for(int i=0;i<len;i++)h=(h*base+s[i])%mod;
-	return h;
+	ll h1=0;
+	for(int i=0;i<len;i++)h1=(h1*base1+s[i])%mod;
+	ll h2=0;
+	for(int i=0;i<len;i++)h2=(h2*base2+s[i])%mod;
+	return h1*mod+h2;
 }
-int token_in_email(const char *token,int token_len,char *email,int email_len)
+int ll_compare (const void *a, const void *b)
 {
-	for(int i=0;i<email_len-token_len;i++)
+	if(*(ll*)a<*(ll*)b)return -1;
+	if(*(ll*)a==*(ll*)b)return 0;
+	else return 1;
+}
+ll *token_set[10020];
+int token_set_size[10020];
+void build_token_set(int email_id)
+{
+	char *content=mails[email_id].content;
+	int email_len=strlen(content);
+	int token_cnt=0;
+	for(int i=0;i<email_len;i++)
 	{
-		if(strncmp(token,email+i,token_len)==0)return 1;
+		if(!isch(content[i]))continue;
+		int r=i;
+		for(int j=i;j<email_len;j++)
+		{
+			if(isch(content[j]))r=j;
+			else break;
+		}
+		token_cnt++;
+		i=r;
 	}
-	return 0;
+	token_set[email_id]=calloc(token_cnt,sizeof(ll));
+	token_set_size[email_id]=token_cnt;
+	token_cnt=0;
+	for(int i=0;i<email_len;i++)
+	{
+		if(!isch(content[i]))continue;
+		int r=i;
+		for(int j=i;j<email_len;j++)
+		{
+			if(isch(content[j]))r=j;
+			else break;
+		}
+		token_set[email_id][token_cnt++]=hash_string(content+i,r-i+1);
+		i=r;
+	}
+	qsort(token_set[email_id],token_cnt,sizeof(ll),ll_compare);
 }
-bool isop(char c)
+int token_in_email(const char *token,int token_len,int email_id)
 {
-	return (c=='('||c==')'||c=='&'||c=='!'||c=='&'||c=='|');
+	ll h=hash_string(token,token_len);
+	if(bsearch(&h,token_set[email_id], token_set_size[email_id], sizeof(ll), ll_compare)!=NULL)return 1;
+	else return 0;
 }
 node in[3000];
 node post[3000];
 node stack[3000];
-bool eval(const char *exp,const char *e_mail,int e_mail_len)
+bool eval(const char *exp,int email_id)
 {
 	int explen=strlen(exp);
 	int inorder_size=0;
@@ -57,7 +100,7 @@ bool eval(const char *exp,const char *e_mail,int e_mail_len)
 				else break;
 			}
 			in[inorder_size].type=TOK;
-			in[inorder_size].data=token_in_email(exp+i,token_end-i+1,e_mail,e_mail_len);
+			in[inorder_size].data=token_in_email(exp+i,token_end-i+1,email_id);
 			inorder_size++;
 			i=token_end;
 		}
@@ -83,7 +126,7 @@ bool eval(const char *exp,const char *e_mail,int e_mail_len)
 			}
 			stack_size--;
 		}
-		else
+		else if(in[i].data)
 		{
 			while(stack_size>0&&stack[stack_size-1].data!='(')
 			{
@@ -136,6 +179,7 @@ int main(void)
 			if(mails[i].content[j]==0)break;
 			else mails[i].content[j]=tolower(mails[i].content[j]);
 		}
+		build_token_set(i);
 	}
 	for(int i=0;i<n_queries;i++)
 	{
@@ -144,14 +188,14 @@ int main(void)
 			int cnt=0;
 			for(int j=0;j<n_mails;j++)
 			{
-				int len=strlen(mails[j].content);
-                if(eval(queries[i].data.expression_match_data.expression,mails[j].content,len))
+                if(eval(queries[i].data.expression_match_data.expression,j))
                 {
                     answer[cnt]=j;
                     cnt++;
                 }
 			}
-			api.answer(i,answer,cnt);
+			if(cnt!=0)api.answer(i,answer,cnt);
+			else api.answer(i,NULL,0);
 		}
 	}
 	return 0;
