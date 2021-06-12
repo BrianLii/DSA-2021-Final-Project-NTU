@@ -53,6 +53,7 @@ void get_token(string filename,int id)
     getline(filein,tmp);
     getline(filein,tmp);
     getline(filein,tmp);
+    cnt=0;
     while(cnt<tmp.size())
     {
         tmp[cnt]=lower_case(tmp[cnt]);
