@@ -16,6 +16,13 @@ typedef struct node
 	int type,data;
 }node;
 typedef long long ll;
+inline int chrtoi(char c);
+int chrtoi(char c)
+{
+	if('a'<=c&&c<='z')return c-'a';
+	if('0'<=c&&c<='9')return 26+c-'0';
+	else return 36;
+}
 int ll_compare (const void *a, const void *b)
 {
 	if(*(ll*)a<*(ll*)b)return -1;
@@ -58,6 +65,53 @@ int unique(ll *a,int n)
 		}
 	}
 	return tail+1;
+}
+typedef struct TRIE_node
+{
+	struct TRIE_node *son[37];
+	int hash_value;
+}TRIE_node;
+typedef struct TRIE
+{
+	struct TRIE_node *root;
+	int string_num;
+}TRIE;
+TRIE_node *new_TRIE_node()
+{
+	TRIE_node *res=calloc(1,sizeof(TRIE_node));
+	res->hash_value=-1;
+	return res;
+}
+void TRIE_init(TRIE *tree)
+{
+	tree->root=new_TRIE_node();
+	tree->string_num=0;
+}
+void TRIE_insert(TRIE *tree,const char *s,int len)
+{
+	TRIE_node *now=tree->root;
+	for(int i=0;i<len;i++)
+	{
+		int tar=chrtoi(s[i]);
+		if(!now->son[tar])now->son[tar]=new_TRIE_node();
+		now=now->son[tar];
+	}
+	if(now->hash_value==-1)
+	{
+		now->hash_value=tree->string_num;
+		tree->string_num++;
+	}
+}
+int TRIE_query(TRIE *tree,const char *s,int len)
+{
+	TRIE_node *now=tree->root;
+	for(int i=0;i<len;i++)
+	{
+		int tar=chrtoi(s[i]);
+		if(!now->son[tar])return -1;
+		now=now->son[tar];
+	}
+	return now->hash_value;
 }
 const ll base1=15401689;
 const ll base2=10580467;
@@ -223,7 +277,6 @@ bool eval(const char *exp,int email_id)
 	}
 	return stack[0].data;
 }
-
 int dsu_lead[20020];
 int dsu_size[20020];
 int dsu_maxsize;
@@ -245,7 +298,6 @@ void dsu_U(int x,int y)
 		dsu_maxsize=ts;
 }
 int answer[20000];
-ll name_hash[20020];
 int from_hash[20020];
 int to_hash[20020];
 void G_A(int query_id)
@@ -283,30 +335,47 @@ void G_A(int query_id)
 	answer[1]=dsu_maxsize;
 	api.answer(query_id,answer,2);
 }
-
 void build_name_hash()
 {
+	TRIE name_TRIE;
+	TRIE_init(&name_TRIE);
 	for(int i=0;i<n_mails;i++)
 	{
-		name_hash[i*2]=hash_string(mails[i].from,strlen(mails[i].from));
-		name_hash[i*2+1]=hash_string(mails[i].to,strlen(mails[i].to));
+		TRIE_insert(&name_TRIE,mails[i].from,strlen(mails[i].from));
+		TRIE_insert(&name_TRIE,mails[i].to,strlen(mails[i].to));
 	}
-	qsort(name_hash,n_mails*2,sizeof(ll),ll_compare);
-	int n=unique(name_hash,n_mails*2);
 	for(int i=0;i<n_mails;i++)
 	{
-		ll h1=hash_string(mails[i].from,strlen(mails[i].from));
-		ll h2=hash_string(mails[i].to,strlen(mails[i].to));
-		h1=lower_bound(name_hash,n,h1);
-		h2=lower_bound(name_hash,n,h2);
-		from_hash[i]=h1;
-		to_hash[i]=h2;
+		from_hash[i]=TRIE_query(&name_TRIE,mails[i].from,strlen(mails[i].from));
+		to_hash[i]=TRIE_query(&name_TRIE,mails[i].to,strlen(mails[i].to));
 	}
 }
-
 int main(void)
 {
 	api_init(&n_mails, &n_queries, &mails, &queries);
+	for(int i=0;i<n_mails;i++)
+	{
+		for(int j=0;;j++)
+		{
+			if(mails[i].from[j]==0)break;
+			else mails[i].from[j]=tolower(mails[i].from[j]);
+		}
+		for(int j=0;;j++)
+		{
+			if(mails[i].to[j]==0)break;
+			else mails[i].to[j]=tolower(mails[i].to[j]);
+		}
+		for(int j=0;;j++)
+		{
+			if(mails[i].content[j]==0)break;
+			else mails[i].content[j]=tolower(mails[i].content[j]);
+		}
+		for(int j=0;;j++)
+		{
+			if(mails[i].subject[j]==0)break;
+			else mails[i].subject[j]=tolower(mails[i].subject[j]);
+		}
+	}
 	build_name_hash();
 	for(int i=0;i<n_queries;i++)
 	{
@@ -315,13 +384,9 @@ int main(void)
 			G_A(i);
 		}
 	}
+	return 0;
 	for(int i=0;i<n_mails;i++)
 	{
-		for(int j=0;;j++)
-		{
-			if(mails[i].content[j]==0)break;
-			else mails[i].content[j]=tolower(mails[i].content[j]);
-		}
 		build_token_set(i);
 	}
 	for(int i=0;i<n_queries;i++)
@@ -338,5 +403,3 @@ int main(void)
 	}
 	return 0;
 }
-
-
