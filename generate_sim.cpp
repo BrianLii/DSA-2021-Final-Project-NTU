@@ -1,4 +1,7 @@
-#include<bits/stdc++.h>
+#include<fstream>
+#include<set>
+#include<vector>
+#include<iostream>
 using namespace std;
 vector<string>token[10005];
 bool is_token(char c)
@@ -133,3 +136,4 @@ int main()
         }
     }
 }
+
