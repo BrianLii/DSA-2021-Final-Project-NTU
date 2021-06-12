@@ -13,7 +13,7 @@ int main()
     }
     f.close();
     fout<<"    static double similarity[1000][10000]={";
-    f.open("similarity.txt");
+    f.open("../similarity.txt");
     for(int i=1;i<=1000;i++)
     {
         if(i!=1) fout<<",";
