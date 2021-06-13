@@ -76,7 +76,7 @@ void get_token(string filename,int id)
     }
     tokens.insert("i");
     tokens.insert("read");
-    tokens.insert("this");
+    tokens.insert("th");
     tokens.insert("paragraph");
     tokens.insert("on");
     tokens.insert("http");
