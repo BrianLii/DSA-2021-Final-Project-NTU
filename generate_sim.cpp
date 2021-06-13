@@ -50,6 +50,7 @@ void get_token(string filename,int id)
     getline(filein,tmp);
     getline(filein,tmp);
     getline(filein,tmp);
+    cnt=0;
     while(cnt<tmp.size())
     {
         tmp[cnt]=lower_case(tmp[cnt]);
@@ -70,7 +71,14 @@ void get_token(string filename,int id)
         tokens.insert(tmp_token);
         tmp_token.clear();
     }
-
+    tokens.insert("i");
+    tokens.insert("read");
+    tokens.insert("this");
+    tokens.insert("paragraph");
+    tokens.insert("on");
+    tokens.insert("http");
+    tokens.insert("wikipedia");
+    tokens.insert("org");
     for(auto o:tokens)
     {
         token[id].push_back(o);
@@ -103,6 +111,9 @@ int main()
             cout<<i<<' '<<token[i].size()<<'\n';
         }
     }
+    for(auto o:token[1425])
+        cout<<o<<' ';
+
     ofstream fout;
     fout.open("similarity.txt");
     for(int i=1;i<=10000;i++)
@@ -132,4 +143,5 @@ int main()
             fout<<sim_rate<<' ';
         }
     }
+
 }
