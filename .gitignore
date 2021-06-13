@@ -1,6 +1,9 @@
 similarity.txt
+sim_AND.txt
+
 test.c
 *.out
 main.exe
 /testdata
+/test_data
 /validator

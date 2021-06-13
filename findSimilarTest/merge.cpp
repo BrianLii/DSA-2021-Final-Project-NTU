@@ -12,22 +12,16 @@ int main()
         fout<<buf<<endl;
     }
     f.close();
-    fout<<"    static double similarity[1000][10000]={";
-    f.open("../similarity.txt");
-    for(int i=1;i<=1000;i++)
-    {
-        if(i!=1) fout<<",";
-        fout<<"{";
-        for(int j=1;j<=10000;j++)
-        {
-            if(j!=1) fout<<",";
-            f>>buf;
-            fout<<buf;
-        }
-        fout<<"}";
-    }
+    fout<<"const char *sim_s=\"";
+    f.open("../sim_AND.txt");
+	f>>buf;
+	//control the size of the table
+	//20000*10000 == table[10000][10000]
+	string nbuf="";
+	for(int i=0;i<20000*10000;i++)nbuf+=buf[i];
+	fout<<nbuf;
     f.close();
-    fout<<"};"<<endl;
+    fout<<"\";"<<endl;
     f.open("end.txt");
     while(getline(f,buf)){
         fout<<buf<<endl;
