@@ -1,3 +1,6 @@
+similarity.txt
+test.c
+*.out
 main.exe
 /testdata
 /validator

@@ -1,4 +1,7 @@
-#include<bits/stdc++.h>
+#include<fstream>
+#include<set>
+#include<vector>
+#include<iostream>
 using namespace std;
 vector<string>token[10005];
 bool is_token(char c)
@@ -103,7 +106,7 @@ int main()
     for(int i=1;i<=10000;i++)
     {
         string num=int_to_string(i);
-        string mailname="test_data/mail"+num;
+        string mailname="testdata/test_data/mail"+num;
         //cout<<mailname<<'\n';
         get_token(mailname,i);
         if(i/200*200==i)
@@ -145,3 +148,4 @@ int main()
     }
 
 }
+
