@@ -20,7 +20,6 @@ int main()
             //20000*10000 == table[10000][10000]
             for(int i=0;i<20000*10000;i++)nbuf+=buf[i];
             fout<<nbuf;
-            f.close();
             fout<<"\";"<<endl;
         }
         else
