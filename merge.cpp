@@ -15,9 +15,16 @@ int main()
             fout<<"const char *sim_s=\"";
 			string tmp;
 			a>>tmp;
-            string nbuf="";
-            int N=5000,M=10000;
-            for(int i=0;i<N*M*2;i++)nbuf+=tmp[i];
+			string nbuf="";
+			int n=10000;
+			for(int i=0;i<n;i++)
+			{
+				for(int j=0;j<=i;j++)
+				{
+					nbuf+=tmp[(i*10000+j)*2];
+					nbuf+=tmp[(i*10000+j)*2+1];
+				}
+			}
             fout<<nbuf;
             fout<<"\";\n";
         }
