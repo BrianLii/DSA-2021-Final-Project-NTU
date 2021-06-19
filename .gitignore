@@ -4,7 +4,7 @@ main_merge.c
 
 test.c
 *.out
-main.exe
+*.exe
 /testdata
 /test_data
 /validator
