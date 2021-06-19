@@ -1,5 +1,6 @@
 similarity.txt
 sim_AND.txt
+main_merge.c
 
 test.c
 *.out
