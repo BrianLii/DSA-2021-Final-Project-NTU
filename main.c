@@ -47,9 +47,9 @@ void build_similar(int n)
 }
 int main()
 {
+	api_init(&n_mails, &n_queries, &mails, &queries);
 	int ans_len, mid;
 	double threshold;
-	api_init(&n_mails, &n_queries, &mails, &queries);
 	build_similar(10000);
  	for(int i=0;i<n_queries;i++)
 	{
@@ -57,13 +57,13 @@ int main()
 			ans_len = 0;
 			mid = queries[i].data.find_similar_data.mid;
 			threshold = queries[i].data.find_similar_data.threshold;
-		for(int i=0;i<n_mails;i++)
-		{
-			if(i!=mid&&similar[mid][i]>threshold)
-				answer[ans_len++]=i;
-		}
-		if(ans_len!=0) api.answer(i,answer,ans_len);
-		else api.answer(i,NULL,0);
+			for(int i=0;i<n_mails;i++)
+			{
+				if(i!=mid&&similar[mid][i]>threshold)
+					answer[ans_len++]=i;
+			}
+			if(ans_len!=0) api.answer(i,answer,ans_len);
+			else api.answer(i,NULL,0);
 		}
 	}
 	return 0;
