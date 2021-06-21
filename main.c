@@ -37,7 +37,7 @@ void build_similar(int n)
 	int pos=0;
 	for(int i=0;i<n;i++)
 	{
-		for(int j=0;j<=i;j++)
+		for(int j=0;j<i;j++)
 		{
 			double AND=Htoi(sim_s+pos);
 			similar[j][i]=similar[i][j]=AND/(token_set_size[i]+token_set_size[j]-AND);
