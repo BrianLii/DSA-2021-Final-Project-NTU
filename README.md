@@ -1,8 +1,7 @@
 # DSA final
 
-Team ID: Team 37
-
-Student IDs: B09902061, B09902054, B09902105
+#### Team ID: Team 37
+#### Student IDs: B09902061, B09902054, B09902105
 
 ### 我們只做Find Similar這個task
 
