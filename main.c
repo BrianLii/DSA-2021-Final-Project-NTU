@@ -58,6 +58,7 @@ int FindSimilar(int qid,int last[],int last_size,int answer[])
 			answer[ans_len++]=last[i];
 		}
 	}
+	answer[ans_len++]=-1;
 	if(ans_len!=0)api.answer(qid,answer,ans_len);
 	else api.answer(qid,NULL,0);
 	return ans_len;
