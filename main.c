@@ -12,9 +12,6 @@ int cmp (const void * a, const void * b)
 	if(queries[*(int*)a].data.find_similar_data.threshold<
 	   queries[*(int*)b].data.find_similar_data.threshold)
 		return -1;
-	else if(queries[*(int*)a].data.find_similar_data.threshold==
-	        queries[*(int*)b].data.find_similar_data.threshold)
-		return 0;
 	else return 1;
 }
 inline int chrtoi(char c);
