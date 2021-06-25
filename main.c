@@ -71,7 +71,7 @@ int ans_start[10000];
 int ans_1[10000];
 int ans_2[10000];
 int mail_queue[10000][1000];
-int ans_group[10000];
+int ans_group[20000];
 int mail_queue_size[10000];
 void G_A(int qid)
 {
