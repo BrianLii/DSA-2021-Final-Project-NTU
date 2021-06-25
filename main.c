@@ -4,18 +4,19 @@
 #include<string.h>
 #include<stdbool.h>
 #define SWAP(a,b,type) {type tmp=a;a=b;b=tmp;}
-#define TOK 1
-#define OPR 2
-#define isop(c) (c=='('||c==')'||c=='&'||c=='!'||c=='|')
-#define isch(c) (('0'<=c&&c<='9')||('a'<=c&&c<='z'))
 int n_mails,n_queries;
 mail *mails;
 query *queries;
-typedef struct node
+int cmp (const void * a, const void * b)
 {
-	int type,data;
-}node;
-typedef long long ll;
+	if(queries[*(int*)a].data.find_similar_data.threshold<
+	   queries[*(int*)b].data.find_similar_data.threshold)
+		return -1;
+	else if(queries[*(int*)a].data.find_similar_data.threshold==
+	        queries[*(int*)b].data.find_similar_data.threshold)
+		return 0;
+	else return 1;
+}
 inline int chrtoi(char c);
 int chrtoi(char c)
 {
@@ -81,17 +82,7 @@ int main()
 	{
 		int *arr=mail_queue[i];
 		int n=mail_queue_size[i];
-		for(int j=0;j<n;j++)
-		{
-			for(int k=0;k+1<n-j;k++)
-			{
-				if(queries[arr[k]].data.find_similar_data.threshold>
-				   queries[arr[k+1]].data.find_similar_data.threshold)
-				{
-					SWAP(arr[k],arr[k+1],int)
-				}
-			}
-		}
+		qsort(arr,n,sizeof(int),cmp);
 	}
 	for(int i=0;i<10000;i++)
 	{
