@@ -42,6 +42,10 @@ void dsu_U(int x,int y)
 	if(x==y)return;
 	if(dsu_size[x]==1)dsu_one--;
 	if(dsu_size[y]==1)dsu_one--;
+	if(dsu_size[x]<dsu_size[y])
+	{
+		SWAP(x,y,int)
+	}
 	int ts=dsu_size[x]+dsu_size[y];
 	dsu_lead[y]=x;
 	dsu_size[x]=ts;
