@@ -71,7 +71,7 @@ int ans_start[10000];
 int ans_1[10000];
 int ans_2[10000];
 int mail_queue[10000][1000];
-int ans_group[20000];
+int ans_group[2];
 int mail_queue_size[10000];
 void G_A(int qid)
 {
@@ -104,9 +104,11 @@ void G_A(int qid)
 
 	for(int i=0;i<len;i++)
 		dsu_U(from_hash[mid[i]],to_hash[mid[i]]);
-	ans_group[0]=dsu_numg-dsu_one;
-	ans_group[1]=dsu_maxsize;
-	api.answer(qid,ans_group,0);
+	//ans_group[0]=dsu_numg-dsu_one;
+	//ans_group[1]=dsu_maxsize;
+	ans_group[0]=-1;
+	ans_group[1]=-1;
+	api.answer(qid,ans_group,2);
 }
 int FindSimilar(int qid,int last[],int last_size,int answer[])
 {
@@ -158,7 +160,7 @@ int main()
 	}
 	for(int i=0;i<n_queries;i++)
 	{
-		if(queries[i].type==group_analyse)
+		if(queries[i].type==group_analyse&&queries[i].data.group_analyse_data.len<=150)
 		{
 			G_A(i);
 		}
