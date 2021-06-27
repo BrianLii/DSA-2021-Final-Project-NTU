@@ -1,6 +1,16 @@
 #include<fstream>
 #include<iostream>
 using namespace std;
+int chrtoi(char c)
+{
+	if('a'<=c&&c<='z')return c-'a';
+	if('A'<=c&&c<='Z')return 26+c-'A';
+	else return 52+c-'0';
+}
+int Htoi(char c1,char c2)
+{
+	return 62*chrtoi(c1)+chrtoi(c2);
+}
 int main()
 {
     ofstream fout;
@@ -21,8 +31,13 @@ int main()
 			{
 				for(int j=0;j<=i;j++)
 				{
-					nbuf+=tmp[(i*10000+j)*2];
-					nbuf+=tmp[(i*10000+j)*2+1];
+					int num=Htoi(tmp[(i*10000+j)*2],tmp[(i*10000+j)*2+1]);
+					nbuf+=num/64+'0';
+					if(num/64+'0'=='\\')nbuf+='\\';
+					nbuf+=num%64+'0';
+					if(num%64+'0'=='\\')nbuf+='\\';
+					//nbuf+=tmp[(i*10000+j)*2];
+					//nbuf+=tmp[(i*10000+j)*2+1];
 				}
 			}
             fout<<nbuf;
