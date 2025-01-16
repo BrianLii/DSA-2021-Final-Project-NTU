@@ -14,8 +14,7 @@ if __name__ == "__main__":
     sender_receiver_filename = "sender_receiver.txt"
     with open(sender_receiver_filename, "r") as sender_receiver:
         ids = sender_receiver.read().split()
-        sender_id = ids[::2]
-        receiver_id = ids[1::2]
+        sender_id, receiver_id = ids[::2], ids[1::2]
         FROM_HASH_INIT = to_c_array(sender_id)
         TO_HASH_INIT = to_c_array(receiver_id)
 
