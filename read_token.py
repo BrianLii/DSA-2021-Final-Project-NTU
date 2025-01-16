@@ -1,5 +1,5 @@
 import re
-
+import sys
 
 def unique(tmp):
     return sorted(list(set(tmp)))
@@ -18,10 +18,9 @@ def get_token_set(filename, token_regex=r"[A-Za-z0-9]+"):
     return unique(tokens)
 
 
-def collect_all_token(
+def get_all_tokens(
     input_prefix="test_data/mail",
     num_files=10000,
-    output_filename="all_tokens.txt",
     log_freq=1000,
 ):
     num_files = 10000
@@ -29,12 +28,10 @@ def collect_all_token(
     for i in range(1, num_files + 1):
         all_tokens.extend(get_token_set(f"{input_prefix}{i}"))
         if i % log_freq == 0:
-            print(f"{i}/{num_files} completed")
+            print(f"{i}/{num_files} completed", file=sys.stderr)
     all_tokens = unique(all_tokens)
-    with open(output_filename, "w") as file:
-        for token in all_tokens:
-            file.write(f"{token},")
+    return all_tokens
 
 
 if __name__ == "__main__":
-    collect_all_token()
+    print(*get_all_tokens())
