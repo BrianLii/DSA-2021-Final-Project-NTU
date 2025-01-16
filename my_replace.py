@@ -17,6 +17,7 @@ if __name__ == '__main__':
 
     with open('sim_and.txt', 'r') as sim_and:
         SIM_S_INIT = sim_and.read()
+        SIM_S_INIT = SIM_S_INIT.replace('\\', '\\\\')
 
     with open(source_name, 'r') as source:
         source = source.read()

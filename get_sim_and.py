@@ -3,7 +3,7 @@ from dsa_mail.token import get_tokens
 
 
 def count_hash(count):
-    charlist = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/'
+    charlist = ''.join(chr(i) for i in range(ord('0'), ord('0') + 64))
     return charlist[count >> 6] + charlist[count & 0x3F]
 
 

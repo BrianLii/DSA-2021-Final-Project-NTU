@@ -42,7 +42,7 @@ void dsu_U(int x,int y)
 	if(ts>dsu_maxsize)
 		dsu_maxsize=ts;
 }
-INIT_sim_s
+const char *sim_s="SIM_S_INIT";
 double similar[10000][10000];
 int token_set_size[10000]=TOKEN_SET_SIZE_INIT;
 int from_hash[20020]=FROM_HASH_INIT;
