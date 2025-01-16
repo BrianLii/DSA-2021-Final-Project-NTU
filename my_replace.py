@@ -4,7 +4,6 @@ def to_c_array(data):
 
 if __name__ == "__main__":
     source_name = "main.c"
-    new_source_name = "new_" + source_name
 
     token_sizes_filename = "token_sizes.txt"
     with open(token_sizes_filename, "r") as token_sizes:
@@ -24,5 +23,4 @@ if __name__ == "__main__":
         source = source.replace("FROM_HASH_INIT", FROM_HASH_INIT)
         source = source.replace("TO_HASH_INIT", TO_HASH_INIT)
 
-    with open(new_source_name, "w") as new_source:
-        new_source.write(source)
+    print(source)
