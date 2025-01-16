@@ -2,49 +2,39 @@ import re
 
 
 def unique(tmp):
-    return list(set(tmp))
+    return sorted(list(set(tmp)))
 
 
-def get_token_set(filename):  # get all token in a mail
-    f = open(filename, "r")
-    tmp = f.readline()
-    tmp = f.readline()
-    tmp = f.readline()
-    tmp = f.readline()
-    tmp = f.readline()
-    tmp = f.readline()
-    tmp = f.readline()
-    tmp = re.findall("([A-Za-z0-9]+)", tmp)
-    content = [i.lower() for i in tmp]
-    content = unique(content)
-
-    f = open(filename, "r")
-    tmp = f.readline()
-    tmp = f.readline()
-    tmp = f.readline()
-    tmp = f.readline()
-    tmp = tmp[9:]
-    tmp = re.findall("([A-Za-z0-9]+)", tmp)
-    subject = [i.lower() for i in tmp]
-    subject = unique(subject)
-    return unique(subject + content)
+def get_token_set(filename, token_regex=r"[A-Za-z0-9]+"):
+    tokens = []
+    with open(filename, "r") as file:
+        for i in range(7):
+            line = file.readline()
+            if i == 3:
+                tokens.extend(re.findall(token_regex, line[9:]))
+            elif i == 6:
+                tokens.extend(re.findall(token_regex, line))
+    tokens = [token.lower() for token in tokens]
+    return unique(tokens)
 
 
-def collect_all_token():
-    all_token = []
-    for i in range(1, 10001):
-        name = "test_data/mail" + str(i)
-        all_token = all_token + get_token_set(name)
-        if i % 200 == 0:
-            print(f"{i}/10000")
-            all_token = list(set(all_token))
-    all_token = unique(all_token)
-    w = open("alltoken.txt", "w")
-    for i in all_token:
-        w.write(f"{i},")
-    return all_token
+def collect_all_token(
+    input_prefix="test_data/mail",
+    num_files=10000,
+    output_filename="all_tokens.txt",
+    log_freq=1000,
+):
+    num_files = 10000
+    all_tokens = []
+    for i in range(1, num_files + 1):
+        all_tokens.extend(get_token_set(f"{input_prefix}{i}"))
+        if i % log_freq == 0:
+            print(f"{i}/{num_files} completed")
+    all_tokens = unique(all_tokens)
+    with open(output_filename, "w") as file:
+        for token in all_tokens:
+            file.write(f"{token},")
 
 
-collect_all_token()
-f = open("alltoken.txt", "r")
-all_token = f.readline().split(",")
+if __name__ == "__main__":
+    collect_all_token()
