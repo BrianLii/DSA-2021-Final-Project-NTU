@@ -7,4 +7,3 @@ test.c
 *.exe
 /testdata
 /test_data
-/validator
