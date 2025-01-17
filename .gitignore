@@ -1,9 +1,7 @@
-similarity.txt
-sim_AND.txt
-main_merge.c
+**/__pycache__/
+.build/
+.test/
+main
 
-test.c
-*.out
-*.exe
 /testdata
 /test_data
