@@ -3,20 +3,20 @@ from dsa_mail.token import get_tokens
 
 
 def count_hash(count):
-    charlist = ''.join(chr(i) for i in range(ord('0'), ord('0') + 64))
+    charlist = "".join(chr(i) for i in range(ord("0"), ord("0") + 64))
     return charlist[count >> 6] + charlist[count & 0x3F]
 
 
-if __name__ == '__main__':
-    input_prefix = 'mail_data/mail'
+if __name__ == "__main__":
+    input_prefix = "mail_data/mail"
     num_files = 10000
     log_freq = 500
     tokens = [None] * (num_files + 1)
     for i in range(1, num_files + 1):
-        tokens[i] = set(get_tokens(f'{input_prefix}{i}'))
+        tokens[i] = set(get_tokens(f"{input_prefix}{i}"))
 
     for i in range(1, num_files + 1):
         for j in range(1, i + 1):
-            print(count_hash(len(tokens[i] & tokens[j])), end='')
+            print(count_hash(len(tokens[i] & tokens[j])), end="")
         if (i + 1) % log_freq == 0:
-            print(f'{i + 1}/{num_files} completed', file=sys.stderr)
+            print(f"{i + 1}/{num_files} completed", file=sys.stderr)
