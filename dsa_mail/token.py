@@ -16,5 +16,5 @@ def get_tokens(filename, token_regex=r'[A-Za-z0-9]+'):
     tokens = [token.lower() for token in tokens]
     return unique(tokens)
 
-def get_tokens_size(filename, token_regex=r'[A-Za-z0-9]+'):
+def get_num_tokens(filename, token_regex=r'[A-Za-z0-9]+'):
     return len(get_tokens(filename, token_regex))
