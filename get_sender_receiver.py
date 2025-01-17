@@ -13,3 +13,4 @@ if __name__ == '__main__':
         print(sender, receiver)
         if i % log_freq == 0:
             print(f'{i}/{num_files} completed', file=sys.stderr)
+    print(f'number of names: {len(names)}', file=sys.stderr)
