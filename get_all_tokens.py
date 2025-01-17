@@ -2,7 +2,7 @@ import sys
 from dsa_mail.token import get_tokens, unique
 
 if __name__ == '__main__':
-    input_prefix = 'test_data/mail'
+    input_prefix = 'mail_data/mail'
     num_files = 10000
     log_freq = 1000
     all_tokens = []

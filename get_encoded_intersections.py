@@ -8,7 +8,7 @@ def count_hash(count):
 
 
 if __name__ == '__main__':
-    input_prefix = 'test_data/mail'
+    input_prefix = 'mail_data/mail'
     num_files = 10000
     log_freq = 500
     tokens = [None] * (num_files + 1)

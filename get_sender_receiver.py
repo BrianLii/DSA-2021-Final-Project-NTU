@@ -2,7 +2,7 @@ import sys
 from dsa_mail.name import get_sender_receiver, name_to_id
 
 if __name__ == '__main__':
-    input_prefix = 'test_data/mail'
+    input_prefix = 'mail_data/mail'
     num_files = 10000
     log_freq = 1000
     names = dict()
