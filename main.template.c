@@ -62,11 +62,9 @@ void build_similar(int n) {
         }
     }
 }
-int ans_start[10000];
-int ans_1[10000];
-int ans_2[10000];
+int candidates_1[NUM_MAILS], candidates_2[NUM_MAILS];
 int ans_group[2];
-int find_similar_queries[NUM_MAILS][1000];
+int find_similar_queries[NUM_MAILS][1024];
 int num_find_similar_queries[NUM_MAILS];
 
 void G_A(int qid) {
@@ -98,24 +96,24 @@ void G_A(int qid) {
     ans_group[1] = dsu_maxsize;
     api.answer(qid, ans_group, 2);
 }
-int FindSimilar(int qid, int last[], int last_size, int answer[]) {
-    int ans_len = 0, mid = queries[qid].data.find_similar_data.mid;
+int answer_find_similar(int qid, int candidates[], int num_candidates,
+                        int answer[]) {
+    int answer_len = 0, mid = queries[qid].data.find_similar_data.mid;
     double threshold = queries[qid].data.find_similar_data.threshold;
-    for (int i = 0; i < last_size; i++) {
-        if (similar[mid][last[i]] > threshold && last[i] != mid) {
-            answer[ans_len++] = last[i];
+    for (int i = 0; i < num_candidates; i++) {
+        if (similar[mid][candidates[i]] > threshold && candidates[i] != mid) {
+            answer[answer_len++] = candidates[i];
         }
     }
-    if (ans_len != 0)
-        api.answer(qid, answer, ans_len);
+    if (answer_len)
+        api.answer(qid, answer, answer_len);
     else
         api.answer(qid, NULL, 0);
-    return ans_len;
+    return answer_len;
 }
 int main() {
     api_init(&n_mails, &n_queries, &mails, &queries);
     build_similar(NUM_MAILS);
-    for (int i = 0; i < NUM_MAILS; i++) ans_start[i] = i;
     for (int i = 0; i < n_queries; i++) {
         if (queries[i].type == find_similar) {
             int mid = queries[i].data.find_similar_data.mid;
@@ -123,18 +121,17 @@ int main() {
         }
     }
     for (int i = 0; i < NUM_MAILS; i++) {
-        qsort(find_similar_queries[i], num_find_similar_queries[i], sizeof(int), cmp);
+        qsort(find_similar_queries[i], num_find_similar_queries[i], sizeof(int),
+              cmp);
     }
     for (int i = 0; i < NUM_MAILS; i++) {
-        int *last, *now, last_len;
-        if (num_find_similar_queries[i])
-            last_len = FindSimilar(find_similar_queries[i][0], ans_start, 10000, ans_1);
-        last = ans_1;
-        now = ans_2;
-        for (int j = 1; j < num_find_similar_queries[i]; j++) {
-            last_len = FindSimilar(find_similar_queries[i][j], last, last_len, now);
-            SWAP(last, now, int *)
-            if (now == ans_start) now = ans_2;
+        int *current = candidates_1, *previous = candidates_2;
+        int num_previous = NUM_MAILS;
+        for (int i = 0; i < NUM_MAILS; i++) previous[i] = i;
+        for (int j = 0; j < num_find_similar_queries[i]; j++) {
+            num_previous = answer_find_similar(find_similar_queries[i][j],
+                                               previous, num_previous, current);
+            SWAP(previous, current, int *);
         }
     }
     for (int i = 0; i < n_queries; i++) {
