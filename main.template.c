@@ -20,7 +20,8 @@ int cmp(const void *a, const void *b) {
     else
         return 1;
 }
-inline int chrtoi(char c);
+#define NUM_MAILS 10000
+
 int dsu_lead[20020];
 int dsu_size[20020];
 int dsu_maxsize;
@@ -46,10 +47,10 @@ void dsu_U(int x, int y) {
     if (ts > dsu_maxsize) dsu_maxsize = ts;
 }
 const char *sim_s = "SIM_S_INIT";
-double similar[10000][10000];
-int num_tokens[10000] = NUM_TOKENS_INIT;
-int send_ids[20020] = SEND_IDS_INIT;
-int recv_ids[20020] = RECV_IDS_INIT;
+double similar[NUM_MAILS][NUM_MAILS];
+int num_tokens[NUM_MAILS] = NUM_TOKENS_INIT;
+int send_ids[NUM_MAILS] = SEND_IDS_INIT;
+int recv_ids[NUM_MAILS] = RECV_IDS_INIT;
 void build_similar(int n) {
     const char *pos = sim_s;
     for (int i = 0; i < n; i++) {
@@ -64,9 +65,10 @@ void build_similar(int n) {
 int ans_start[10000];
 int ans_1[10000];
 int ans_2[10000];
-int mail_queue[10000][1000];
 int ans_group[2];
-int mail_queue_size[10000];
+int find_similar_queries[NUM_MAILS][1000];
+int num_find_similar_queries[NUM_MAILS];
+
 void G_A(int qid) {
     int len = queries[qid].data.group_analyse_data.len;
     int *mid = queries[qid].data.group_analyse_data.mids;
@@ -112,27 +114,25 @@ int FindSimilar(int qid, int last[], int last_size, int answer[]) {
 }
 int main() {
     api_init(&n_mails, &n_queries, &mails, &queries);
-    build_similar(10000);
-    for (int i = 0; i < 10000; i++) ans_start[i] = i;
+    build_similar(NUM_MAILS);
+    for (int i = 0; i < NUM_MAILS; i++) ans_start[i] = i;
     for (int i = 0; i < n_queries; i++) {
         if (queries[i].type == find_similar) {
             int mid = queries[i].data.find_similar_data.mid;
-            mail_queue[mid][mail_queue_size[mid]++] = i;
+            find_similar_queries[mid][num_find_similar_queries[mid]++] = i;
         }
     }
-    for (int i = 0; i < 10000; i++) {
-        int *arr = mail_queue[i];
-        int n = mail_queue_size[i];
-        qsort(arr, n, sizeof(int), cmp);
+    for (int i = 0; i < NUM_MAILS; i++) {
+        qsort(find_similar_queries[i], num_find_similar_queries[i], sizeof(int), cmp);
     }
-    for (int i = 0; i < 10000; i++) {
+    for (int i = 0; i < NUM_MAILS; i++) {
         int *last, *now, last_len;
-        if (mail_queue_size[i])
-            last_len = FindSimilar(mail_queue[i][0], ans_start, 10000, ans_1);
+        if (num_find_similar_queries[i])
+            last_len = FindSimilar(find_similar_queries[i][0], ans_start, 10000, ans_1);
         last = ans_1;
         now = ans_2;
-        for (int j = 1; j < mail_queue_size[i]; j++) {
-            last_len = FindSimilar(mail_queue[i][j], last, last_len, now);
+        for (int j = 1; j < num_find_similar_queries[i]; j++) {
+            last_len = FindSimilar(find_similar_queries[i][j], last, last_len, now);
             SWAP(last, now, int *)
             if (now == ans_start) now = ans_2;
         }
