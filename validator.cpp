@@ -8,7 +8,7 @@ typedef unsigned long long ull;
 typedef pair<ull, double> P;
 
 int main(){
-	ifstream ans("testdata/test.out", fstream::in);
+	ifstream ans("test_data/test.out", fstream::in);
 
 	int query_id;
 	double reward;

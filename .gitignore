@@ -2,6 +2,9 @@
 .build/
 .test/
 main
+main.c
 
-/testdata
-/test_data
+mail_data/
+test_data/
+test_data.zip
+mail_data.tar.gz

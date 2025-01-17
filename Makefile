@@ -1,3 +1,11 @@
+.PHONY: download
+download:
+	gdown '1-GPVynhpkj8gJseWnsxFBKn_YXyuxCDi'
+	tar -xvzf mail_data.tar.gz
+	mv test_data mail_data
+	gdown '1-0ONMtK8khrYSwl7Xe8HM9i9vpnx94mI'
+	unzip test_data.zip
+
 .build:
 	mkdir -p .build
 
@@ -22,6 +30,10 @@ main: main.c api.h
 .test/validator: validator.cpp | .test
 	g++ validator.cpp -o .test/validator -O3
 
-.PHONY: run
-run: main .test/validator
-	./main < testdata/test.in | .test/validator
+.PHONY: test
+test: main .test/validator
+	./main < test_data/test.in | .test/validator
+
+.PHONY: clean
+clean:
+	rm -rf .build .test main
