@@ -1,21 +1,27 @@
-num_tokens.txt: get_num_tokens.py
-	python get_num_tokens.py > num_tokens.txt
+.build:
+	mkdir -p .build
 
-sender_receiver.txt: get_sender_receiver.py
-	python get_sender_receiver.py > sender_receiver.txt
+.build/num_tokens.txt: get_num_tokens.py | .build
+	python get_num_tokens.py > .build/num_tokens.txt
 
-encoded_intersections.txt: get_encoded_intersections.py
-	python get_encoded_intersections.py > encoded_intersections.txt
+.build/sender_receiver.txt: get_sender_receiver.py | .build
+	python get_sender_receiver.py > .build/sender_receiver.txt
 
-main.c: main.template.c fill_template.py num_tokens.txt sender_receiver.txt encoded_intersections.txt
+.build/encoded_intersections.txt: get_encoded_intersections.py | .build
+	python get_encoded_intersections.py > .build/encoded_intersections.txt
+
+main.c: main.template.c fill_template.py .build/num_tokens.txt .build/sender_receiver.txt .build/encoded_intersections.txt
 	python fill_template.py > main.c
 
 main: main.c api.h
 	gcc main.c -o main -O3 -std=c11 -w
 
-validator/validator: validator/validator.cpp
-	g++ validator/validator.cpp -o validator/validator -O3
+.test:
+	mkdir -p .test
 
-.PHONY=run
-run: main validator/validator
-	./main < testdata/test.in | validator/validator
+.test/validator: validator.cpp | .test
+	g++ validator.cpp -o .test/validator -O3
+
+.PHONY: run
+run: main .test/validator
+	./main < testdata/test.in | .test/validator
