@@ -25,27 +25,24 @@ int cmp(const void *a, const void *b) {
 
 int dsu_lead[NUM_NAMES];
 int dsu_size[NUM_NAMES];
-int dsu_maxsize;
-int dsu_numg;
-int dsu_one;
+int dsu_maxsize, dsu_num_groups, dsu_num_ones;
 int dsu_find(int x) {
     if (dsu_lead[x] == x) return x;
     return dsu_lead[x] = dsu_find(dsu_lead[x]);
 }
-void dsu_U(int x, int y) {
+void dsu_union(int x, int y) {
     x = dsu_find(x);
     y = dsu_find(y);
     if (x == y) return;
-    if (dsu_size[x] == 1) dsu_one--;
-    if (dsu_size[y] == 1) dsu_one--;
+    if (dsu_size[x] == 1) dsu_num_ones--;
+    if (dsu_size[y] == 1) dsu_num_ones--;
     if (dsu_size[x] < dsu_size[y]) {
         SWAP(x, y, int)
     }
-    int ts = dsu_size[x] + dsu_size[y];
+    dsu_size[x] += dsu_size[y];
     dsu_lead[y] = x;
-    dsu_size[x] = ts;
-    dsu_numg--;
-    if (ts > dsu_maxsize) dsu_maxsize = ts;
+    dsu_num_groups--;
+    if (dsu_size[x] > dsu_maxsize) dsu_maxsize = dsu_size[x];
 }
 const char *sim_s = "SIM_S_INIT";
 double similar[NUM_MAILS][NUM_MAILS];
@@ -64,38 +61,40 @@ void build_similar(int n) {
     }
 }
 int candidates_1[NUM_MAILS], candidates_2[NUM_MAILS];
-int ans_group[2];
 int find_similar_queries[NUM_MAILS][1024];
 int num_find_similar_queries[NUM_MAILS];
 
-void G_A(int qid) {
-    int len = queries[qid].data.group_analyse_data.len;
+void answer_group_analyse(int qid) {
+    static int answer_group[2];
+    int length_mids = queries[qid].data.group_analyse_data.len;
     int *mids = queries[qid].data.group_analyse_data.mids;
-    dsu_numg = 0;
+    dsu_num_groups = 0;
     dsu_maxsize = 1;
 
-    for (int i = 0; i < len; i++) {
+    for (int i = 0; i < length_mids; i++) {
         dsu_lead[send_ids[mids[i]]] = -1;
         dsu_lead[recv_ids[mids[i]]] = -1;
-        dsu_size[send_ids[mids[i]]] = 1;
-        dsu_size[recv_ids[mids[i]]] = 1;
     }
-    for (int i = 0; i < len; i++) {
+    for (int i = 0; i < length_mids; i++) {
         if (dsu_lead[send_ids[mids[i]]] == -1) {
-            dsu_numg++;
+            dsu_num_groups++;
             dsu_lead[send_ids[mids[i]]] = send_ids[mids[i]];
+            dsu_size[send_ids[mids[i]]] = 1;
         }
         if (dsu_lead[recv_ids[mids[i]]] == -1) {
-            dsu_numg++;
+            dsu_num_groups++;
             dsu_lead[recv_ids[mids[i]]] = recv_ids[mids[i]];
+            dsu_size[recv_ids[mids[i]]] = 1;
         }
     }
-    dsu_one = dsu_numg;
+    dsu_num_ones = dsu_num_groups;
 
-    for (int i = 0; i < len; i++) dsu_U(send_ids[mids[i]], recv_ids[mids[i]]);
-    ans_group[0] = dsu_numg - dsu_one;
-    ans_group[1] = dsu_maxsize;
-    api.answer(qid, ans_group, 2);
+    for (int i = 0; i < length_mids; i++) {
+        dsu_union(send_ids[mids[i]], recv_ids[mids[i]]);
+    }
+    answer_group[0] = dsu_num_groups - dsu_num_ones;
+    answer_group[1] = dsu_maxsize;
+    api.answer(qid, answer_group, 2);
 }
 int answer_find_similar(int qid, int candidates[], int num_candidates,
                         int answer[]) {
@@ -138,7 +137,7 @@ int main() {
     for (int i = 0; i < n_queries; i++) {
         if (queries[i].type == group_analyse &&
             queries[i].data.group_analyse_data.len <= 150) {
-            G_A(i);
+            answer_group_analyse(i);
         }
     }
     return 0;
