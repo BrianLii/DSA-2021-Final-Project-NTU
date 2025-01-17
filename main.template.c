@@ -21,9 +21,10 @@ int cmp(const void *a, const void *b) {
         return 1;
 }
 #define NUM_MAILS 10000
+#define NUM_NAMES 1024
 
-int dsu_lead[20020];
-int dsu_size[20020];
+int dsu_lead[NUM_NAMES];
+int dsu_size[NUM_NAMES];
 int dsu_maxsize;
 int dsu_numg;
 int dsu_one;
@@ -69,29 +70,29 @@ int num_find_similar_queries[NUM_MAILS];
 
 void G_A(int qid) {
     int len = queries[qid].data.group_analyse_data.len;
-    int *mid = queries[qid].data.group_analyse_data.mids;
+    int *mids = queries[qid].data.group_analyse_data.mids;
     dsu_numg = 0;
     dsu_maxsize = 1;
-    // make set
+
     for (int i = 0; i < len; i++) {
-        dsu_lead[send_ids[mid[i]]] = -1;
-        dsu_lead[recv_ids[mid[i]]] = -1;
-        dsu_size[send_ids[mid[i]]] = 1;
-        dsu_size[recv_ids[mid[i]]] = 1;
+        dsu_lead[send_ids[mids[i]]] = -1;
+        dsu_lead[recv_ids[mids[i]]] = -1;
+        dsu_size[send_ids[mids[i]]] = 1;
+        dsu_size[recv_ids[mids[i]]] = 1;
     }
     for (int i = 0; i < len; i++) {
-        if (dsu_lead[send_ids[mid[i]]] == -1) {
+        if (dsu_lead[send_ids[mids[i]]] == -1) {
             dsu_numg++;
-            dsu_lead[send_ids[mid[i]]] = send_ids[mid[i]];
+            dsu_lead[send_ids[mids[i]]] = send_ids[mids[i]];
         }
-        if (dsu_lead[recv_ids[mid[i]]] == -1) {
+        if (dsu_lead[recv_ids[mids[i]]] == -1) {
             dsu_numg++;
-            dsu_lead[recv_ids[mid[i]]] = recv_ids[mid[i]];
+            dsu_lead[recv_ids[mids[i]]] = recv_ids[mids[i]];
         }
     }
     dsu_one = dsu_numg;
 
-    for (int i = 0; i < len; i++) dsu_U(send_ids[mid[i]], recv_ids[mid[i]]);
+    for (int i = 0; i < len; i++) dsu_U(send_ids[mids[i]], recv_ids[mids[i]]);
     ans_group[0] = dsu_numg - dsu_one;
     ans_group[1] = dsu_maxsize;
     api.answer(qid, ans_group, 2);
