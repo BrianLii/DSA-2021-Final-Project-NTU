@@ -47,20 +47,21 @@ void dsu_union(int x, int y) {
 }
 
 /* Find Similarity */
-const char *sim_s = "SIM_S_INIT";
+const char *encoded_intersection = "ENCODED_INTERSECTION";
 double similar[NUM_MAILS][NUM_MAILS];
 int num_tokens[NUM_MAILS] = NUM_TOKENS_INIT;
 int candidates_1[NUM_MAILS], candidates_2[NUM_MAILS];
 int find_similar_queries[NUM_MAILS][1024];
 int num_find_similar_queries[NUM_MAILS];
 void build_similar(int n) {
-    const char *pos = sim_s;
+    const char *current = encoded_intersection;
     for (int i = 0; i < n; i++) {
         for (int j = 0; j <= i; j++) {
-            double AND = (((*pos) - '0') << 6) | ((*(pos + 1)) - '0');
+            double intersection =
+                (((*current) - '0') << 6) | ((*(current + 1)) - '0');
             similar[j][i] = similar[i][j] =
-                AND / (num_tokens[i] + num_tokens[j] - AND);
-            pos += 2;
+                intersection / (num_tokens[i] + num_tokens[j] - intersection);
+            current += 2;
         }
     }
 }

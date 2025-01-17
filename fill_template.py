@@ -16,14 +16,14 @@ if __name__ == '__main__':
         RECV_IDS_INIT = to_c_array(receiver_id)
 
     with open('sim_and.txt', 'r') as sim_and:
-        SIM_S_INIT = sim_and.read()
-        SIM_S_INIT = SIM_S_INIT.replace('\\', '\\\\')
+        ENCODED_INTERSECTION = sim_and.read()
+        ENCODED_INTERSECTION = ENCODED_INTERSECTION.replace('\\', '\\\\')
 
     with open(source_name, 'r') as source:
         source = source.read()
         source = source.replace('NUM_TOKENS_INIT', NUM_TOKENS_INIT)
         source = source.replace('SEND_IDS_INIT', SEND_IDS_INIT)
         source = source.replace('RECV_IDS_INIT', RECV_IDS_INIT)
-        source = source.replace('SIM_S_INIT', SIM_S_INIT)
+        source = source.replace('ENCODED_INTERSECTION', ENCODED_INTERSECTION)
 
     print(source)
