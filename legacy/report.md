@@ -31,6 +31,7 @@ $Q_g\approx450000$ = 共有幾筆 Group-Analyse 查詢
 2. 開一個二維陣列 similar[ $N$ ][ $N$ ]，similar[ $N$ ][ $N$ ] 初始化為第 $i$ 封郵件與第 $j$ 封郵件的間的 similarity
 3. 對於一個查詢 {mid, threshold}，找出所有 $j$ 滿足 $\text{similar}[mid][j]>\text{threshold}$
 
+> [!NOTE]
 > 問題：每個浮點數因為精確度的關係，至少需要5個字元表示，整份檔案太大，無法上傳至OJ
 
 ### 優化一 將表格壓縮
@@ -42,6 +43,7 @@ $Q_g\approx450000$ = 共有幾筆 Group-Analyse 查詢
 2. 將數字轉成64進位，再用不同的 ascii code 表示 0 ~ 63，即可用兩個字元表示一個整數
 3. 不重複存 $(i,j)$ 與 $(j,i)$ 的 similarity，進一步將表的大小壓到原本的一半
 
+> [!TIP]
 > 成果：成功將code大小壓縮至大約90MB
 
 
@@ -65,7 +67,7 @@ $Q_g\approx450000$ = 共有幾筆 Group-Analyse 查詢
 - 從字元陣列建 similarity 表
     - 時間及空間複雜度皆為 $O(N^2)$
 - 對於同 mid 的查詢，按照 threshold 排序
-    - 用c語言的 `qsort()` 排序，且假設查詢的郵件分布平均
+    - 用 c 語言的 `qsort()` 排序，且假設查詢的郵件分布平均
     - 時間複雜度約為 $O(Nq\lg q)$、空間複雜度為 $O(Q_f)$
 - 每次查詢花 $O(N)$ 時間檢查與其他郵件的similarity，有 $Q$ 筆查詢
     - 時間複雜度為 $O(Q_fN)$、空間複雜度為 $O(1)$
