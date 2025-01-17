@@ -4,15 +4,11 @@
 #include <stdbool.h>
 #include <string.h>
 
-#define SWAP(a, b, type) \
-    {                    \
-        type tmp = a;    \
-        a = b;           \
-        b = tmp;         \
-    }
-int n_mails, n_queries;
-mail *mails;
+#define NUM_MAILS 10000
+#define NUM_NAMES 1024
 query *queries;
+
+/* Helper Functions */
 int cmp(const void *a, const void *b) {
     if (queries[*(int *)a].data.find_similar_data.threshold <
         queries[*(int *)b].data.find_similar_data.threshold)
@@ -20,9 +16,14 @@ int cmp(const void *a, const void *b) {
     else
         return 1;
 }
-#define NUM_MAILS 10000
-#define NUM_NAMES 1024
+#define SWAP(a, b, type) \
+    {                    \
+        type tmp = a;    \
+        a = b;           \
+        b = tmp;         \
+    }
 
+/* Disjoint Set Union */
 int dsu_lead[NUM_NAMES];
 int dsu_size[NUM_NAMES];
 int dsu_maxsize, dsu_num_groups, dsu_num_ones;
@@ -44,11 +45,14 @@ void dsu_union(int x, int y) {
     dsu_num_groups--;
     if (dsu_size[x] > dsu_maxsize) dsu_maxsize = dsu_size[x];
 }
+
+/* Find Similarity */
 const char *sim_s = "SIM_S_INIT";
 double similar[NUM_MAILS][NUM_MAILS];
 int num_tokens[NUM_MAILS] = NUM_TOKENS_INIT;
-int send_ids[NUM_MAILS] = SEND_IDS_INIT;
-int recv_ids[NUM_MAILS] = RECV_IDS_INIT;
+int candidates_1[NUM_MAILS], candidates_2[NUM_MAILS];
+int find_similar_queries[NUM_MAILS][1024];
+int num_find_similar_queries[NUM_MAILS];
 void build_similar(int n) {
     const char *pos = sim_s;
     for (int i = 0; i < n; i++) {
@@ -60,10 +64,25 @@ void build_similar(int n) {
         }
     }
 }
-int candidates_1[NUM_MAILS], candidates_2[NUM_MAILS];
-int find_similar_queries[NUM_MAILS][1024];
-int num_find_similar_queries[NUM_MAILS];
+int answer_find_similar(int qid, int candidates[], int num_candidates,
+                        int answer[]) {
+    int answer_len = 0, mid = queries[qid].data.find_similar_data.mid;
+    double threshold = queries[qid].data.find_similar_data.threshold;
+    for (int i = 0; i < num_candidates; i++) {
+        if (similar[mid][candidates[i]] > threshold && candidates[i] != mid) {
+            answer[answer_len++] = candidates[i];
+        }
+    }
+    if (answer_len)
+        api.answer(qid, answer, answer_len);
+    else
+        api.answer(qid, NULL, 0);
+    return answer_len;
+}
 
+/* Group Analyse */
+int send_ids[NUM_MAILS] = SEND_IDS_INIT;
+int recv_ids[NUM_MAILS] = RECV_IDS_INIT;
 void answer_group_analyse(int qid) {
     static int answer_group[2];
     int length_mids = queries[qid].data.group_analyse_data.len;
@@ -96,22 +115,9 @@ void answer_group_analyse(int qid) {
     answer_group[1] = dsu_maxsize;
     api.answer(qid, answer_group, 2);
 }
-int answer_find_similar(int qid, int candidates[], int num_candidates,
-                        int answer[]) {
-    int answer_len = 0, mid = queries[qid].data.find_similar_data.mid;
-    double threshold = queries[qid].data.find_similar_data.threshold;
-    for (int i = 0; i < num_candidates; i++) {
-        if (similar[mid][candidates[i]] > threshold && candidates[i] != mid) {
-            answer[answer_len++] = candidates[i];
-        }
-    }
-    if (answer_len)
-        api.answer(qid, answer, answer_len);
-    else
-        api.answer(qid, NULL, 0);
-    return answer_len;
-}
 int main() {
+    int n_mails, n_queries;
+    mail *mails;
     api_init(&n_mails, &n_queries, &mails, &queries);
     build_similar(NUM_MAILS);
     for (int i = 0; i < n_queries; i++) {
