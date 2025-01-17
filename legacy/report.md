@@ -28,7 +28,7 @@ $Q_g\approx450000$ = 共有幾筆 Group-Analyse 查詢
 
 ### 基本做法
 1. Online Judge 上郵件的排列順序跟本地的相同，所以可以先離線建出兩兩郵件間similarity的表
-2. 開一個二維陣列 similar[$N$][$N$]，similar[$N$][$N$] 初始化為第 $i$ 封郵件與第 $j$ 封郵件的間的 similarity
+2. 開一個二維陣列 similar[ $N$ ][ $N$ ]，similar[ $N$ ][ $N$ ] 初始化為第 $i$ 封郵件與第 $j$ 封郵件的間的 similarity
 3. 對於一個查詢 {mid, threshold}，找出所有 $j$ 滿足 $\text{similar}[mid][j]>\text{threshold}$
 
 > 問題：每個浮點數因為精確度的關係，至少需要5個字元表示，整份檔案太大，無法上傳至OJ
@@ -79,13 +79,13 @@ $Q_g\approx450000$ = 共有幾筆 Group-Analyse 查詢
 - 整體的時間複雜度 $O(Q_gL\alpha(M))$，空間複雜度 $O(M)$
 
 ## 3. Scheduling Strategy
-- 策略：先做Find Similar，剩的時間做 Group Analyze
-- 原因：Find Similar 的分數遠大於其他種差巡，又可以做很多次
-- Find Similar 複雜度為 $O(Q_fN)$，數量級大約為 $10^9$，但是扣除api.init() 的時間，主程式只花了大約5秒，代表優化處理query的順序十分有效
+- 策略：先做 Find Similar，剩的時間做 Group Analyze
+- 原因：Find Similar 的分數遠大於其他種查詢，又可以做很多次
+- Find Similar 複雜度為 $O(Q_fN)$，數量級大約為 $10^9$，但是扣除 `api.init()` 的時間，主程式只花了大約 5 秒，代表優化處理查詢的順序 (優化二) 十分有效
 
 ## 4. Additional Notes 
 
 ### 安排query順序在平均情況下的常數分析
-- 假設 threshold 和 similarity 的分佈平均，且每封 mail 的 Find-Similarity 查詢平均有$q$筆
-- 每次利用上一個thereshold得到的結果可以減少$\frac1q$筆
-- 只需要檢查$\frac1q+\frac2q+...+\frac qq=\frac {(q+1)}2$次，等於少看一半。
+- 假設 threshold 和 similarity 的分佈平均，且每封 mail 的 Find-Similarity 查詢平均有 $q$ 筆
+- 每次利用上一個 thereshold 得到的結果可以減少 $\frac1q$ 筆
+- 只需要檢查 $\frac1q+\frac2q+...+\frac qq=\frac {(q+1)}2$ 次，等於少看一半。
